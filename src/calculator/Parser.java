@@ -71,7 +71,7 @@ class Parser {
 		public String toString() {
 			switch (type) {
 			case INCHES:
-				return value / PT_PER_IN + " in";
+				return value +" in";
 			case POINTS:
 				return value + " pt";
 			default:
@@ -89,18 +89,24 @@ class Parser {
     public Expression Parser(Lexer lexer) {
         Expression expression;
         Token token = lexer.next();
+
         if (token != null) {
-            if (token.type == Type.SCALAR | token.type == Type.POINTS | token.type == Type.INCHES) {
+
+        	if (token.type == Type.SCALAR | token.type == Type.POINTS | token.type == Type.INCHES) {
                 expression = new Expression(token);
                 return expression;
             } else {
-                Token operator;
+            	Token operator;
                 Expression leftExpression;
                 Expression rightExpression;
                 leftExpression = Parser(lexer);
                 operator = lexer.next();
+
                 if (operator != null) {
-                    if (operator.type == Type.CLOSEPAREN) {
+                	if (operator.type == Type.OPENPAREN) {
+                		return leftExpression;
+                	}
+                	if (operator.type == Type.CLOSEPAREN) {
                         return leftExpression;
                     } else if (operator.type == Type.INCHSYMBOL | operator.type == Type.POINTSYMBOL) {
                         Expression rightLeftExpression;
@@ -154,6 +160,7 @@ class Parser {
         Double rightValue = rightOperand.value;
 
         switch (operatorType) {
+        
             case PLUS:
                 if (leftType == ValueType.SCALAR) {
                     return(new Value(leftValue + rightValue, rightType));
@@ -201,13 +208,14 @@ class Parser {
 	// TODO write method spec
 	public Value evaluate(String expression) {
 		// TODO implement for Problem 4
+		expression = expression.replaceAll("\\s",""); // strip whitespaces for examples like 3 + 2.4
         Lexer lexer = new Lexer(expression);
         Expression parsed = Parser(lexer);
         return evaluateIter(parsed);
 	}
 
     public Value evaluateIter(Expression parsed) {
-        if (parsed.isLeaf()) {
+    	if (parsed.isLeaf()) {
             Token token = parsed.leaf;
             return(new Value(token.getTokenValue(), token.getTokenType()));
         }

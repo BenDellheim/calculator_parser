@@ -22,10 +22,8 @@ public class MultiUnitCalculator {
 		Lexer lexer = new Lexer(expression);
 		Parser parser = new Parser(lexer);
 		Value value = parser.evaluate(expression);
-		String result;
-		result = value.toString();
-		return result;
-	}
+		return(value.toString());
+}
 
 	/**
 	 * Repeatedly reads expressions from the console, and outputs the results of
@@ -35,21 +33,6 @@ public class MultiUnitCalculator {
 	 *            unused
 	 */
 	public static void main(String[] args) throws IOException {
-		MultiUnitCalculator calculator;
-		String result;
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		String expression;
-		while (true) {
-			System.out.print("> ");
-			// read input
-			expression = in.readLine();
-			Lexer lexer = new Lexer(expression);
-			Parser parser = new Parser(lexer);
-			Value value = parser.evaluate(expression);
-			result = value.toString();
-			// display result
-			System.out.println(result);
-		}
 	}
 }

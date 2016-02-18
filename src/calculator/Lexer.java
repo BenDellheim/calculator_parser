@@ -84,25 +84,25 @@ public class Lexer {
     }
 
     public boolean isPoint(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?PT");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?pt");
         Matcher m = p.matcher(s);
         return (m.find());
     }
 
     public boolean isInch(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?IN");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?in");
         Matcher m = p.matcher(s);
         return (m.find());
     }
 
     public boolean isScalar(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(?!(PT|IN))");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(?!(pt|in))");
         Matcher m = p.matcher(s);
         return (m.find());
     }
 
     public Integer getPoint(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(PT){1}");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(pt){1}");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -110,7 +110,7 @@ public class Lexer {
     }
 
     public Integer getInch(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?IN");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?in");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -118,13 +118,13 @@ public class Lexer {
     }
 
     public boolean isInchSymbol(String s) {
-        Pattern p = Pattern.compile("^IN{1}");
+        Pattern p = Pattern.compile("^in{1}");
         Matcher m = p.matcher(s);
         return (m.find());
     }
 
     public Integer getInchSymbol(String s) {
-        Pattern p = Pattern.compile("^IN{1}");
+        Pattern p = Pattern.compile("^in{1}");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -132,13 +132,13 @@ public class Lexer {
     }
 
     public boolean isPointSymbol(String s) {
-        Pattern p = Pattern.compile("^PT{1}");
+        Pattern p = Pattern.compile("^pt{1}");
         Matcher m = p.matcher(s);
         return (m.find());
     }
 
     public Integer getPointSymbol(String s) {
-        Pattern p = Pattern.compile("^PT{1}");
+        Pattern p = Pattern.compile("^pt{1}");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -147,7 +147,7 @@ public class Lexer {
 
 
     public Integer getScalar(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(?!(PT|IN))");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(?!(pt|in))");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -156,8 +156,10 @@ public class Lexer {
 
 
     public Token next() {
-        if (hasNext()) {
-            if (input.charAt(i) == '(') {
+
+    	if (hasNext()) {
+
+    		if (input.charAt(i) == '(') {
                 i++;
                 return (new Token(Type.OPENPAREN, "("));
             } else if (input.charAt(i) == ')') {
