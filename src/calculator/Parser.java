@@ -3,7 +3,18 @@ package calculator;
 import calculator.Lexer;
 
 /*
- * TODO define your grammar from problem 1 here
+ * Grammar for the calculator:
+ * 
+ * 	Expression ::= (Primitive | Combination) EOF
+ * 	Primitive ::= Number (Unit | )
+ * 	Number ::= [0-9]+((.[0-9]+) | )
+ * 	Unit ::= 'in' | 'pt'
+ * 	Combination ::= Arithmetic
+ * 				  | Unit_Conversion
+ * 				  | '(' Expression ')'
+ * 	Arithmetic ::= Expression Operator Expression
+ * 	Operator ::= '+' | '-' | '*' | '/'
+ * 	Unit_Conversion ::= '(' Expression ')' Unit	
  */
 
 /**

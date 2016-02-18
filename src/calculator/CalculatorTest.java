@@ -5,8 +5,11 @@ import org.junit.Test;
 
 public class CalculatorTest {
 
-	// TODO write tests for MultiUnitCalculator.evaluate
-
+	   @Test
+	   public void testPrintMessage() {	
+		   //dummy test I (jimi) put in to serve as an initial stub
+	   }
+	
 	boolean approxEquals(String expr1, String expr2, boolean compareUnits) {
 		return new Value(expr1).approxEquals(new Value(expr2), compareUnits);
 	}
