@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import calculator.Parser.Value;
+
 /**
  * Multi-unit calculator.
  */
@@ -17,9 +19,12 @@ public class MultiUnitCalculator {
 	 *         units, e.g. "72pt", "3", or "4.882in"
 	 */
 	public String evaluate(String expression) {
-		// TODO implement for Problem 4
-		String foo = "";
-		return foo;
+		Lexer lexer = new Lexer(expression);
+		Parser parser = new Parser(lexer);
+		Value value = parser.evaluate(expression);
+		String result;
+		result = value.toString();
+		return result;
 	}
 
 	/**
@@ -36,17 +41,13 @@ public class MultiUnitCalculator {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		String expression;
 		while (true) {
-			// display prompt
 			System.out.print("> ");
 			// read input
 			expression = in.readLine();
-			// terminate if input empty
-			if (expression.equals(""))
-				break;
-
-			// evaluate
-			calculator = new MultiUnitCalculator();
-			result = calculator.evaluate(expression);
+			Lexer lexer = new Lexer(expression);
+			Parser parser = new Parser(lexer);
+			Value value = parser.evaluate(expression);
+			result = value.toString();
 			// display result
 			System.out.println(result);
 		}

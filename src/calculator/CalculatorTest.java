@@ -1,15 +1,23 @@
 package calculator;
 
-import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class CalculatorTest {
 
-	   @Test
-	   public void testPrintMessage() {	
-		   //dummy test I (jimi) put in to serve as an initial stub
-	   }
-	
+	@Test
+	public void test() {
+		MultiUnitCalculator calculator;
+		calculator = new MultiUnitCalculator();
+		assertEquals("5.1",calculator.evaluate("3+2.1"));
+		assertEquals("5.2",calculator.evaluate("3+2.2"));
+		assertEquals("-1.4",calculator.evaluate("1-2.4"));
+
+		
+		
+		
+		
+	}
 	boolean approxEquals(String expr1, String expr2, boolean compareUnits) {
 		return new Value(expr1).approxEquals(new Value(expr2), compareUnits);
 	}

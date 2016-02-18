@@ -1,44 +1,27 @@
 package calculator;
 
 /*
- * Legitimate tokens for a calculator parser:
- * 
- * 	EOF		(end of input)
- * 	'6', '6.25', ... (any positive number)
- * 	'pt'	(point)
- * 	'in'	(inch)
- * 	'+'		(plus)
- * 	'-'		(minus)
- * 	'*'		(multiply)
- * 	'/'		(divide)
- * 	'('		(open parentheses)
- * 	')'		(close parentheses)
+ * Tokens will include numbers, units, operators, and parenthesis.
+ * Numbers can be either integer or float-point.
+ * Units enums are POINT and INCH
+ * Operators are grouped into four sub-groups: PLUS {+}, MINUS {-}, MULTIPLY {*}, and DIVIDE {/}
+ * OPENPAREN: {(}
+ * CLOSEPAREN: {)}
  */
 
 /**
- * Token types:
- * 
- * 	EOF,			// end of input
- * 	NUMBER,			// any positive number
- * 	POINT, 			// unit 'pt'
- *	INCH,			// unit 'in'
- *	PLUS,			// arithmetic operator '+'
- *	MINUS,			// arithmetic operator '-'
- *	MULTIPLY,		// arithmetic operator '*'
- *	DIVIDE,			// arithmetic operator '/'
- *	OPEN_PAREN,		// open parentheses '('
- *	CLOSE_PAREN		// close parentheses ')'
- *
+ * Token type.
  */
 enum Type {
-	EOF,
-	NUMBER,
-	POINT,
-	INCH,
-	PLUS,
-	MINUS,
-	MULTIPLY,
-	DIVIDE,
-	OPEN_PAREN,
-	CLOSE_PAREN
+	SCALAR,
+    PLUS,
+    MINUS,
+    MULTIPLY,
+    DIVIDE,
+    INCHES,
+    POINTS,
+    OPENPAREN,
+    CLOSEPAREN,
+    POINTSYMBOL,
+    INCHSYMBOL
 }
