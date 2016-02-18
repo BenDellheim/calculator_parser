@@ -48,7 +48,7 @@ class Parser {
 	}
 
 	private static final double PT_PER_IN = 72;
-	private final Lexer lexer;
+	private final Lexer lexer = null;
 
 	// TODO write method spec
 	Parser(Lexer lexer) {
@@ -58,5 +58,6 @@ class Parser {
 	// TODO write method spec
 	public Value evaluate() {
 		// TODO implement for Problem 3
+		return null;
 	}
 }
