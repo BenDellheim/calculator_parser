@@ -6,11 +6,11 @@ import calculator.Lexer.Token.*;
 
 
 /*
- * Expression ::= number | number unit | expression operator expression
- * operator ::= {+, -, *, /}
- * unit ::= {pt, in}
- * number ::= [0-9]+[\\.[0-9]+]?
- *
+ * Expression ::= number | number unit | operand
+ * Number ::= scalar | unit
+ * Scalar ::= whole | decimal
+ * Operand ::= + | - | * | /
+ * Unit ::= inches | points
  */
 
 /**
