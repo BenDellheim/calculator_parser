@@ -57,12 +57,13 @@ public class Lexer {
     static class TokenMismatchException extends Exception {
     }
 
-    // TODO write method spec
+    /*
+     * Problem 2: Implement Lexter
+     */
     public Lexer(String input) {
         i = 0;
         String inputTemp = input;
-        this.input = '(' + inputTemp + ')';
-        this.input.replaceAll("\\s+","");
+        this.input = input.replaceAll("\\s+","");
         N = this.input.length();
     }
 
@@ -84,7 +85,7 @@ public class Lexer {
     }
 
     public boolean isPoint(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?pt");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?pt?s");
         Matcher m = p.matcher(s);
         return (m.find());
     }
@@ -96,13 +97,14 @@ public class Lexer {
     }
 
     public boolean isScalar(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(?!(pt|in))");
+    	System.out.println("S="+s);
+        Pattern p = Pattern.compile("^(\\d+(?:\\.\\d+)?)");
         Matcher m = p.matcher(s);
         return (m.find());
     }
 
     public Integer getPoint(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(pt){1}");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(pt|pts){1}");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -132,13 +134,15 @@ public class Lexer {
     }
 
     public boolean isPointSymbol(String s) {
-        Pattern p = Pattern.compile("^pt{1}");
+    	s = s.replaceAll("\\s+","");
+    	Pattern p = Pattern.compile("^pt{1}");
         Matcher m = p.matcher(s);
         return (m.find());
     }
 
     public Integer getPointSymbol(String s) {
-        Pattern p = Pattern.compile("^pt{1}");
+    	s = s.replaceAll("\\s+","");
+    	Pattern p = Pattern.compile("^(pts?)");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -147,7 +151,8 @@ public class Lexer {
 
 
     public Integer getScalar(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(?!(pt|in))");
+    	System.out.println("getScalar="+s);
+    	Pattern p = Pattern.compile("^(\\d+(?:\\.\\d+)?(pt|pts|in)?)");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -156,43 +161,53 @@ public class Lexer {
 
 
     public Token next() {
-
     	if (hasNext()) {
-
+    		System.out.println("Chart = " +input.charAt(i));
     		if (input.charAt(i) == '(') {
                 i++;
+                System.out.println("a");
                 return (new Token(Type.OPENPAREN, "("));
             } else if (input.charAt(i) == ')') {
                 i++;
+                System.out.println("b");
                 return (new Token(Type.CLOSEPAREN, ")"));
             } else if (input.charAt(i) == '+') {
                 i++;
+                System.out.println("c");
                 return (new Token(Type.PLUS, "+"));
             } else if (input.charAt(i) == '-') {
                 this.i++;
+                System.out.println("d");
                 return (new Token(Type.MINUS, "-"));
             } else if (input.charAt(i) == '*') {
                 i++;
+                System.out.println("e");
                 return (new Token(Type.MULTIPLY, "*"));
             } else if (isInch(input.substring(i, N))) {
                 int endMatch = getInch(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
+                System.out.println("f");
                 return (new Token(Type.INCHES, input.substring(j, i)));
             } else if (isPoint(input.substring(i, N))) {
                 int endMatch = getPoint(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
+                System.out.println("g");
+                System.out.println(input.substring(j, i));
                 return (new Token(Type.POINTS, input.substring(j, i)));
             } else if (isScalar(input.substring(i, N))) {
                 int endMatch = getScalar(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
+                System.out.println("h");
+                System.out.println(input.substring(j, i));
                 return (new Token(Type.SCALAR, input.substring(j, i)));
             } else if (isInchSymbol(input.substring(i, N))) {
                 int endMatch = getInchSymbol(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
+                System.out.println("i");
                 return (new Token(Type.INCHSYMBOL, input.substring(j, i)));
             } else if (isPointSymbol(input.substring(i, N))) {
                 int endMatch = getPointSymbol(input.substring(i, N));
@@ -201,8 +216,14 @@ public class Lexer {
                 return (new Token(Type.POINTSYMBOL, input.substring(j, i)));
             } else {
                 i++;
-                return (new Token(Type.DIVIDE));
+                System.out.println("Division");
+                return (new Token(Type.DIVIDE, "/"));
             }
-        } else return null;
+        } 
+    	else {
+            System.out.println("l");
+            System.out.println(i);
+    		return null;
+    	}
     }
 }
