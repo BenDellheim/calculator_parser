@@ -2,8 +2,15 @@ package calculator;
 
 
 import calculator.Lexer.Token;
-import calculator.Lexer.Token.*;
 
+/* Your parser should use the tokenization produced by
+ * the Lexer to parse the expression according to the
+ * grammar defined in Problem 1. Exactly how you do
+ * this is up to you; the only thing that we enforce is
+ * that the Lexer is passed as an argument to the Parser constructor.
+ * b. Write test cases for these methods in a separate file.
+ * c. Implement the Parser and make sure all your tests pass.
+ */
 
 /*
  * Expression ::= number | number unit | operand
@@ -13,30 +20,39 @@ import calculator.Lexer.Token.*;
  * Unit ::= inches | points
  */
 
-/**
- * Calculator parser. All values are measured in pt.
+
+/* Class Parser - our Calculator parser. All values are measured in Points.
+ * evaluate(String) - Main public function that calls all the parser routines.
+ *                    It returns a Value, so be sure to import Parser.Value. 
+ * 
+ * Subclasses: Value, Expression
  */
 class Parser {
 
     Lexer lexer;
-    // String expression;
     private static final double PT_PER_IN = 72;
 
 	@SuppressWarnings("serial")
 	static class ParserException extends RuntimeException {
 	}
 
-	/**
-	 * Type of values.
+	/* Constructor.
+	 * Parser instances start with a Lexer, which tokenizes the input stream for us.
+	 * Marvelous! How convenient!
 	 */
-	public enum ValueType {
-		POINTS, INCHES, SCALAR
-	};
+    Parser (Lexer lex) {
+        this.lexer = lex;
+    }
 
+	/* Class Expression covers 2 kinds of expressions:
+	 * One with a single parameter (leaf) with no operator, and
+	 * one with 3 parameters (operator, leftExpression, rightExpression)
+	 *  i.e. (PLUS, ex1, ex2) -> ex1 PLUS ex2.
+	 */
     public class Expression {
 
         Token operator;
-        Token leaf = null;
+        Token leaf;
         Expression leftExpression;
         Expression rightExpression;
 
@@ -45,6 +61,7 @@ class Parser {
         }
 
         public Expression(Token operator, Expression leftExpression, Expression rightExpression) {
+        	this.leaf = null;
             this.operator = operator;
             this.leftExpression = leftExpression;
             this.rightExpression = rightExpression;
@@ -55,9 +72,9 @@ class Parser {
         }
     }
 
-	/**
-	 * Internal value is always in points.
-	 */
+    /* Class Value pairs a (double) with the enum ValueType (INCHES, POINTS, SCALAR)
+     * and overrides toString() to display it properly.
+     */
 	public class Value {
 		final double value;
 		final ValueType type;
@@ -71,7 +88,8 @@ class Parser {
 		public String toString() {
 			switch (type) {
 			case INCHES:
-				return value +" in";
+				// Internal value is always in points.
+				return value / PT_PER_IN + " in";
 			case POINTS:
 				return value + " pt";
 			default:
@@ -80,79 +98,104 @@ class Parser {
 		}
 	}
 
-    Parser (Lexer lexer) {
-        this.lexer = lexer;
-    }
-
-	// TODO write method spec
-
-    public Expression Parser(Lexer lexer) {
+	/* Parse() - not to be confused with the constructor
+	 * This takes a tokenized Lexer and converts it to an Expression.
+	 * Expressions can contain smaller Expressions, or a singular value (leaf).
+	 * */
+    public Expression Parse(Lexer lexer) {
+        /* Tokens contain a Type, and either a String of text or (null).
+         * They can return their value (Double), their Type (i.e MULTIPLY), or their ValueType (i.e SCALAR).*/
+        Token token;
         Expression expression;
-        Token token = lexer.next();
 
-        if (token != null) {
+        /*******************************************************
+         * Okay, next up is the clusterfuck I'm trying to fix.
+         * (I fixed some of it.)
+         * Parse() is supposed to recursively create an Expression,
+         * by iterating through the passed Lexer object with Lexer.next().
+         * (BTW: next() checks if the string is used up and returns null,
+         *  so this code needs to check for a null return.)
+         * 
+         * The trick is that it's recursive, so returning a scalar
+         * WOULD work halfway through (i.e. nothing further to evaluate),
+         * but a scalar up front means it returns without checking anything.
+         * 
+         * I'm thinking of counting the number of recursions so it
+         *  keeps reading the string if it's at 0.
+         *  
+         * After that, not really sure if that Paren code works correctly.
+         * So there's that.
+         *******************************************************/
 
-        	if (token.type == Type.SCALAR | token.type == Type.POINTS | token.type == Type.INCHES) {
-                expression = new Expression(token);
-                return expression;
-            } else {
-            	Token operator;
-                Expression leftExpression;
-                Expression rightExpression;
-                leftExpression = Parser(lexer);
-                operator = lexer.next();
-
-                if (operator != null) {
-                	if (operator.type == Type.OPENPAREN) {
-                		return leftExpression;
-                	}
-                	if (operator.type == Type.CLOSEPAREN) {
-                        return leftExpression;
-                    } else if (operator.type == Type.INCHSYMBOL | operator.type == Type.POINTSYMBOL) {
-                        Expression rightLeftExpression;
-                        if (operator.type == Type.INCHSYMBOL) {
-                            rightLeftExpression = new Expression(Lexer.makeInch());
-                        } else {
-                            rightLeftExpression = new Expression(Lexer.makePoint());
-                        }
-                        Expression UnitConversion = new Expression(Lexer.makeMultiply(), rightLeftExpression, leftExpression);
-                        leftExpression = UnitConversion;
-                        operator = lexer.next();
-                    }
-                    if (operator != null) {
-                        rightExpression = Parser(lexer);
-                        Token rightOperator = lexer.next();
-                        if (rightOperator != null) {
-                            if (rightOperator.type == Type.CLOSEPAREN) {
-                                return new Expression(operator, leftExpression, rightExpression);
-                                // return new Expression(operator, leftExpression, rightExpression);
-                            } else if (rightOperator.type == Type.INCHSYMBOL | operator.type == Type.POINTSYMBOL) {
-                                Expression rightLeftExpression;
-                                if (rightOperator.type == Type.INCHSYMBOL) {
-                                    rightLeftExpression = new Expression(Lexer.makeInch());
-                                } else {
-                                    rightLeftExpression = new Expression(Lexer.makePoint());
-                                }
-                                Expression UnitConversion = new Expression(Lexer.makeMultiply(), rightLeftExpression, rightExpression);
-                                rightExpression = UnitConversion;
-                            }
-                        }
-                    } else {
-                        return leftExpression;
-                    }
-                } else {
-                    return leftExpression;
-                }
-            }
-        } else {
-            return null;
+        token = lexer.next();
+        if (token.isNumber()) {
+            expression = new Expression(token);
+//            return expression; // This return makes Parse stop at the first value.
         }
-        return null;
+       // token is an operator
+       Token operator;
+       Expression leftExpression;
+       Expression rightExpression;
+       leftExpression = Parse(lexer);
+
+//       if (lexer.hasNext()) {    // Not necessary since next() checks this
+           operator = lexer.next();
+           if (operator.type == Type.OPENPAREN) {
+        	   return leftExpression;
+           }
+           if (operator.type == Type.CLOSEPAREN) {
+               return leftExpression;
+           } else if (operator.isUnitSymbol()) {
+               Expression rightLeftExpression;
+               if (operator.type == Type.INCHSYMBOL) {
+                   rightLeftExpression = new Expression(Lexer.makeInch());
+               } else {
+                   rightLeftExpression = new Expression(Lexer.makePoint());
+               }
+               Expression UnitConversion = new Expression(Lexer.makeMultiply(), rightLeftExpression, leftExpression);
+               leftExpression = UnitConversion;
+           }
+        //   if (lexer.hasNext()) {
+               operator = lexer.next();
+                        
+               // Recurse to finish evaluating token stream (lexer)
+               rightExpression = Parse(lexer);
+
+        //       if (lexer.hasNext()) {
+                   Token rightOperator = lexer.next();
+                   if (rightOperator.type == Type.CLOSEPAREN) {
+                       return new Expression(operator, leftExpression, rightExpression);
+                   } else if (rightOperator.isUnitSymbol()) {
+                       Expression rightLeftExpression;
+                       if (rightOperator.type == Type.INCHSYMBOL) {
+                           rightLeftExpression = new Expression(Lexer.makeInch());
+                       } else {
+                           rightLeftExpression = new Expression(Lexer.makePoint());
+                       }
+                       Expression UnitConversion = new Expression(Lexer.makeMultiply(), rightLeftExpression, rightExpression);
+                       rightExpression = UnitConversion;
+                   }
+//               } else {
+//                   return leftExpression;
+//               }
+//           } else {
+//               return leftExpression;
+//           }
+//       }
+        // In case there's nothing to parse
+//        return null;
+
+          // Alternative test output so JUnit doesn't throw a Null Pointer Exception when I get here         
+          return new Expression(new Token(Type.SCALAR, "0"));
     }
 
-
-
+    /* Applies the operator *+-/ to two Values
+     * Any other operator is ignored and a null value is returned
+     * (TODO: Encapsulate in error handling in case it tries to add null to something.
+     * In the meantime, please don't break it. >_>)
+     */
     public Value apply(Token operator, Value leftOperand, Value rightOperand) {
+    	 System.out.println("In apply()");
         Type operatorType = operator.getOperatorType();
         ValueType leftType = leftOperand.type;
         ValueType rightType = rightOperand.type;
@@ -192,6 +235,7 @@ class Parser {
                     return(new Value(leftValue*rightValue, ValueType.SCALAR));
                 }
             case DIVIDE:
+            	if (rightValue == 0) return null;
                 if (leftType == ValueType.SCALAR) {
                     return(new Value(leftValue/rightValue, rightType));
                 }
@@ -201,21 +245,22 @@ class Parser {
                 else {
                     return(new Value(leftValue/rightValue, ValueType.SCALAR));
                 }
+            default:
+            	return null;
         }
-        return null;
     }
 
-	// TODO write method spec
+    // Main function called for a Parser instance
 	public Value evaluate(String expression) {
-		// TODO implement for Problem 4
-		expression = expression.replaceAll("\\s",""); // strip whitespaces for examples like 3 + 2.4
         Lexer lexer = new Lexer(expression);
-        Expression parsed = Parser(lexer);
+        Expression parsed = Parse(lexer); // Parses the token stream (lexer) -- NOT a constructor call!
         return evaluateIter(parsed);
 	}
 
+	// Evaluates the expression recursively and returns a Value
     public Value evaluateIter(Expression parsed) {
     	if (parsed.isLeaf()) {
+    		System.out.println("In evaluateIter()");
             Token token = parsed.leaf;
             return(new Value(token.getTokenValue(), token.getTokenType()));
         }
@@ -224,6 +269,7 @@ class Parser {
             Expression leftExpression = parsed.leftExpression;
             Expression rightExpression = parsed.rightExpression;
             return apply(operator, evaluateIter(leftExpression), evaluateIter(rightExpression));
+            // Note that apply() can return null if (operator) is not +-*/
             }
         }
     }

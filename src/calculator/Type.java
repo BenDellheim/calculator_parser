@@ -25,3 +25,7 @@ enum Type {
     POINTSYMBOL,
     INCHSYMBOL
 }
+
+enum ValueType {
+	POINTS, INCHES, SCALAR
+}

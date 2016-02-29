@@ -1,10 +1,9 @@
 package calculator;
 
 import calculator.Type;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import calculator.Parser.ValueType;
+
 /**
  * Calculator lexical analyzer.
  */
@@ -51,6 +50,26 @@ public class Lexer {
                 return (ValueType.POINTS);
             }
         }
+
+        // Brevity functions to make Parser.java easier to read
+        public Boolean isNumber() {
+            if (type == Type.SCALAR | type == Type.POINTS | type == Type.INCHES)
+            	return true;
+            return false;
+        }
+        
+        public Boolean isOperator() {
+        	if (type == Type.PLUS | type == Type.MINUS | type == Type.MULTIPLY | type == Type.DIVIDE)
+        		return true;
+        	return false;
+        }
+        
+        public Boolean isUnitSymbol() {
+        	if (type == Type.POINTSYMBOL | type == Type.INCHSYMBOL)
+        		return true;
+        	return false;
+        }
+
     }
 
     @SuppressWarnings("serial")
@@ -58,12 +77,11 @@ public class Lexer {
     }
 
     /*
-     * Problem 2: Implement Lexter
+     * Problem 2: Implement Lexer
      */
     public Lexer(String input) {
         i = 0;
-        String inputTemp = input;
-        this.input = input.replaceAll("\\s+","");
+        this.input = input.replaceAll("\\s+",""); // strip whitespaces for examples like 3 + 2.4
         N = this.input.length();
     }
 
@@ -97,7 +115,6 @@ public class Lexer {
     }
 
     public boolean isScalar(String s) {
-    	System.out.println("S="+s);
         Pattern p = Pattern.compile("^(\\d+(?:\\.\\d+)?)");
         Matcher m = p.matcher(s);
         return (m.find());
@@ -151,7 +168,6 @@ public class Lexer {
 
 
     public Integer getScalar(String s) {
-    	System.out.println("getScalar="+s);
     	Pattern p = Pattern.compile("^(\\d+(?:\\.\\d+)?(pt|pts|in)?)");
         Matcher m = p.matcher(s);
         m.find();
@@ -162,52 +178,40 @@ public class Lexer {
 
     public Token next() {
     	if (hasNext()) {
-    		System.out.println("Chart = " +input.charAt(i));
     		if (input.charAt(i) == '(') {
                 i++;
-                System.out.println("a");
                 return (new Token(Type.OPENPAREN, "("));
             } else if (input.charAt(i) == ')') {
                 i++;
-                System.out.println("b");
                 return (new Token(Type.CLOSEPAREN, ")"));
             } else if (input.charAt(i) == '+') {
                 i++;
-                System.out.println("c");
                 return (new Token(Type.PLUS, "+"));
             } else if (input.charAt(i) == '-') {
                 this.i++;
-                System.out.println("d");
                 return (new Token(Type.MINUS, "-"));
             } else if (input.charAt(i) == '*') {
                 i++;
-                System.out.println("e");
                 return (new Token(Type.MULTIPLY, "*"));
             } else if (isInch(input.substring(i, N))) {
                 int endMatch = getInch(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
-                System.out.println("f");
                 return (new Token(Type.INCHES, input.substring(j, i)));
             } else if (isPoint(input.substring(i, N))) {
                 int endMatch = getPoint(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
-                System.out.println("g");
-                System.out.println(input.substring(j, i));
                 return (new Token(Type.POINTS, input.substring(j, i)));
             } else if (isScalar(input.substring(i, N))) {
                 int endMatch = getScalar(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
-                System.out.println("h");
-                System.out.println(input.substring(j, i));
                 return (new Token(Type.SCALAR, input.substring(j, i)));
             } else if (isInchSymbol(input.substring(i, N))) {
                 int endMatch = getInchSymbol(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
-                System.out.println("i");
                 return (new Token(Type.INCHSYMBOL, input.substring(j, i)));
             } else if (isPointSymbol(input.substring(i, N))) {
                 int endMatch = getPointSymbol(input.substring(i, N));
@@ -216,13 +220,10 @@ public class Lexer {
                 return (new Token(Type.POINTSYMBOL, input.substring(j, i)));
             } else {
                 i++;
-                System.out.println("Division");
                 return (new Token(Type.DIVIDE, "/"));
             }
         } 
     	else {
-            System.out.println("l");
-            System.out.println(i);
     		return null;
     	}
     }
