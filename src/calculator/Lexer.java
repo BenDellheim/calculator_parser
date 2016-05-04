@@ -30,11 +30,7 @@ public class Lexer {
         }
 
         public double getTokenValue() {
-            if (type == Type.SCALAR) {
-                return (Double.parseDouble(text));
-            } else {
-                return (Double.parseDouble(text.substring(0, text.length() - 2)));
-            }
+        	return (Double.parseDouble(text));
         }
 
         public Type getOperatorType() {
@@ -95,15 +91,15 @@ public class Lexer {
     }
 
     public static Token makePoint() {
-        return (new Token(Type.POINTS, "1PT"));
+        return (new Token(Type.POINTS, "1"));
     }
 
     public static Token makeInch() {
-        return (new Token(Type.INCHES, "1IN"));
+        return (new Token(Type.INCHES, "1"));
     }
 
     public boolean isPoint(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?pt?s");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?pts?");
         Matcher m = p.matcher(s);
         return (m.find());
     }
@@ -115,13 +111,13 @@ public class Lexer {
     }
 
     public boolean isScalar(String s) {
-        Pattern p = Pattern.compile("^(\\d+(?:\\.\\d+)?)");
+        Pattern p = Pattern.compile("^\\d+(\\.\\d+)?");
         Matcher m = p.matcher(s);
         return (m.find());
     }
 
     public Integer getPoint(String s) {
-        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(pt|pts){1}");
+        Pattern p = Pattern.compile("^[0-9]+(\\.[0-9]+)?(pts|pt){1}");
         Matcher m = p.matcher(s);
         m.find();
         m.group();
@@ -188,7 +184,7 @@ public class Lexer {
                 i++;
                 return (new Token(Type.PLUS, "+"));
             } else if (input.charAt(i) == '-') {
-                this.i++;
+                i++;
                 return (new Token(Type.MINUS, "-"));
             } else if (input.charAt(i) == '*') {
                 i++;
@@ -197,17 +193,17 @@ public class Lexer {
                 int endMatch = getInch(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
-                return (new Token(Type.INCHES, input.substring(j, i)));
+                return (new Token(Type.INCHES, input.substring(j, i).replaceAll("[^0-9.]", "")));
             } else if (isPoint(input.substring(i, N))) {
                 int endMatch = getPoint(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
-                return (new Token(Type.POINTS, input.substring(j, i)));
+                return (new Token(Type.POINTS, input.substring(j, i).replaceAll("[^0-9.]", "")));
             } else if (isScalar(input.substring(i, N))) {
                 int endMatch = getScalar(input.substring(i, N));
                 int j = i;
                 i = i + endMatch;
-                return (new Token(Type.SCALAR, input.substring(j, i)));
+                return (new Token(Type.SCALAR, input.substring(j, i).replaceAll("[^0-9.]", "")));
             } else if (isInchSymbol(input.substring(i, N))) {
                 int endMatch = getInchSymbol(input.substring(i, N));
                 int j = i;
